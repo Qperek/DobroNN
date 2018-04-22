@@ -12,22 +12,16 @@ using System.Windows.Media.Media3D;
 
 namespace Magisterka
 {
-    class DigitParser
+    class DigitParser : Parser
     {
-        int magicNumber;
-        int samplesCount;
-        int rows;
         int columns;
-        long offSet;
-        long headerOffSet;
-        string path;
-        int currentDigitNumber = 0;
+        int rows;
 
         public DigitParser(string _path)
         {
             path = _path;
         }
-        public void ReadDigitsHeader()
+        override public void ReadHeader()
         {
             using (FileStream stream = File.Open(path, FileMode.Open))
             using (BinaryReader reader = new BinaryReader(stream))
@@ -36,52 +30,48 @@ namespace Magisterka
                 samplesCount = SwapEndianness(reader.ReadInt32());
                 columns = SwapEndianness(reader.ReadInt32());
                 rows = SwapEndianness(reader.ReadInt32());
+                sampleSize = columns * rows;
                 offSet = reader.BaseStream.Position;
                 headerOffSet = reader.BaseStream.Position;
             }
         }
 
-        public byte[,] ReadNextDigit()
+        override public byte[] ReadNext()
         {
             using (FileStream stream = File.Open(path, FileMode.Open))
             using (BinaryReader reader = new BinaryReader(stream))
             {
-                if (currentDigitNumber < samplesCount)
+                if (currentSampleId < samplesCount)
                 {
-                    return GetDigitFromFile(reader);
+                    return ReadNextSymbol(reader);
                 }
                 else
                 {
-                    currentDigitNumber = 0;
+                    currentSampleId = 0;
                     offSet = headerOffSet;
-                    return GetDigitFromFile(reader);
+                    return ReadNextSymbol(reader);
                 }
             }            
         }
 
-        private byte[,] GetDigitFromFile(BinaryReader reader)
+        private byte[] ReadNextSymbol(BinaryReader reader)
         {
             reader.BaseStream.Seek(offSet, SeekOrigin.Begin);
-            byte[,] digit = new byte[columns, rows];
+            byte[] digit = new byte[sampleSize];
 
-            for (int i = 0; i < columns; i++)
-            {
-                for (int j = 0; j < rows; j++)
-                {
-                    digit[j, i] = reader.ReadByte();
-                }
+            for (int i = 0; i < sampleSize; i++)
+            {                                
+                digit[i] = reader.ReadByte();                
             }
             offSet = reader.BaseStream.Position;
-            currentDigitNumber++;
+            currentSampleId++;
             return digit;
         }
 
-        public void SaveDigitToBmp(byte[,] digit)
+        public void SaveDigitToBmp(byte[] digit)
         {
             string path = "C:\\Users\\Maciek\\Documents\\Visual Studio 2017\\Projects\\Magisterka\\Magisterka\\digit.bmp";
-            byte[] digitInArray = MatrixToArray(digit);
-
-            SaveAsBitmap(path, digitInArray);
+            SaveAsBitmap(path, digit);
         } 
 
         private void SaveAsBitmap(string fileName, byte[] imageData)
@@ -89,11 +79,11 @@ namespace Magisterka
             // Need to copy our 8 bit greyscale image into a 32bit layout.
             // Choosing 32bit rather than 24 bit as its easier to calculate stride etc.
             // This will be slow enough and isn't the most efficient method.
-            var data = new byte[columns * rows * 4];
+            var data = new byte[sampleSize * 4];
 
             int o = 0;
 
-            for (var i = 0; i < columns * rows; i++)
+            for (var i = 0; i < sampleSize; i++)
             {
                 var value = imageData[i];
 
@@ -119,62 +109,10 @@ namespace Magisterka
                 }
             }
         }
-
-        public byte[] MatrixToArray(byte[,] digit)
-        {
-            byte[] array = new byte[columns*rows];
-            int k = 0;
-            for (int i = 0; i < columns; i++)
-            {
-                for (int j = 0; j < rows; j++)
-                {
-                    array[k] = digit[j, i];
-                    k++;
-                }
-            }
-            return array;
-        }
-
-        public double[] ByteArrayToDoubleArray(byte[] digit)
-        {
-            double[] doubleArray = new double[rows * columns];
-            for(int i = 0; i < columns*rows; i++)
-            {
-                doubleArray[i] = digit[i];
-            }
-            return doubleArray;
-        }
-
-        public long GetOffSet()
-        {
-            return offSet;
-        }
-
-        private int SwapEndianness(int value)
-        {
-            var b1 = (value >> 0) & 0xff;
-            var b2 = (value >> 8) & 0xff;
-            var b3 = (value >> 16) & 0xff;
-            var b4 = (value >> 24) & 0xff;
-
-            return b1 << 24 | b2 << 16 | b3 << 8 | b4 << 0;
-        }
-
-        public int GetMagicNumber()
-        {
-            return magicNumber;
-        }
-
-        public int GetSampleCount()
-        {
-            return samplesCount;
-        }
-
         public int GetHeight()
         {
             return columns;
         }
-
         public int GetWidth()
         {
             return rows;

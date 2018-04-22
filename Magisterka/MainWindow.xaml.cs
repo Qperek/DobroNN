@@ -30,7 +30,7 @@ namespace Magisterka
             string path = "C:\\Users\\Maciek\\documents\\visual studio 2017\\Projects\\Magisterka\\Magisterka\\Data\\train-images.idx3-ubyte";
 
             DigitParser parser = new DigitParser(path);
-            parser.ReadDigitsHeader();
+            parser.ReadHeader();
 
             MessageBox.Show("Magic number: "+parser.GetMagicNumber().ToString()  + "\n" +
                             "Samples count: "+parser.GetSampleCount().ToString() + "\n" +
@@ -39,8 +39,7 @@ namespace Magisterka
                             "Offset: " + parser.GetOffSet().ToString());
                                     
             BackPropagationLearning teacher = new BackPropagationLearning(network);
-            byte[,] digit;
-            byte[] oneDimensionDigit;
+            byte[] digit;
             double[] input;
             double[] output;
 
@@ -48,11 +47,10 @@ namespace Magisterka
             double[] result;
             long iterations = 0;
 
-            while(err > 2.0d)
+            while(iterations < 30)
             {
-                digit = parser.ReadNextDigit();
-                oneDimensionDigit = parser.MatrixToArray(digit);
-                input = parser.ByteArrayToDoubleArray(oneDimensionDigit);
+                digit = parser.ReadNext();
+                input = parser.ByteArrayToDoubleArray(digit);
                 output = new double[] { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 };
                 err = teacher.Run(input, output);
 
@@ -61,6 +59,8 @@ namespace Magisterka
                 iterations++;
             }
             MessageBox.Show(err.ToString());
+            parser.SaveDigitToBmp(parser.ReadNext());
+            parser.SaveDigitToBmp(parser.ReadNext());
         }
     }
 }
