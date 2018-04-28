@@ -36,38 +36,6 @@ namespace Magisterka
             }
         }
 
-        override public byte[] ReadNext()
-        {
-            using (FileStream stream = File.Open(path, FileMode.Open))
-            using (BinaryReader reader = new BinaryReader(stream))
-            {
-                if (currentSampleId < samplesCount)
-                {
-                    return ReadNextSymbol(reader);
-                }
-                else
-                {
-                    currentSampleId = 0;
-                    offSet = headerOffSet;
-                    return ReadNextSymbol(reader);
-                }
-            }            
-        }
-
-        private byte[] ReadNextSymbol(BinaryReader reader)
-        {
-            reader.BaseStream.Seek(offSet, SeekOrigin.Begin);
-            byte[] digit = new byte[sampleSize];
-
-            for (int i = 0; i < sampleSize; i++)
-            {                                
-                digit[i] = reader.ReadByte();                
-            }
-            offSet = reader.BaseStream.Position;
-            currentSampleId++;
-            return digit;
-        }
-
         public void SaveDigitToBmp(byte[] digit)
         {
             string path = "C:\\Users\\Maciek\\Documents\\Visual Studio 2017\\Projects\\Magisterka\\Magisterka\\digit.bmp";

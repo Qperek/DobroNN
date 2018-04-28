@@ -46,6 +46,7 @@ namespace Magisterka
             double err = 9999.0d;
             double[] result;
             long iterations = 0;
+            
 
             while(iterations < 30)
             {
@@ -59,8 +60,21 @@ namespace Magisterka
                 iterations++;
             }
             MessageBox.Show(err.ToString());
-            parser.SaveDigitToBmp(parser.ReadNext());
-            parser.SaveDigitToBmp(parser.ReadNext());
+
+            ReadLabelTest();
+        }
+
+        public void ReadLabelTest()
+        {
+            string path = "C:\\Users\\Maciek\\documents\\visual studio 2017\\Projects\\Magisterka\\Magisterka\\Data\\train-labels.idx1-ubyte";
+            LabelParser lb = new LabelParser(path);
+            
+            lb.ReadHeader();
+            MessageBox.Show("Magic number: " + lb.GetMagicNumber().ToString() + "\n" +
+                "Samples count: " + lb.GetSampleCount().ToString() + "\n" +
+                "Offset: " + lb.GetOffSet().ToString());
+            byte label = lb.GetLabel(lb.ReadNext());
+            MessageBox.Show(label.ToString());
         }
     }
 }

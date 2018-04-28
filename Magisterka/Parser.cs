@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ namespace Magisterka
     abstract class Parser
     {
         public int magicNumber;
-        public int sampleSize;
+        public int sampleSize = 1;
         public int samplesCount;
         public long offSet;
         public long headerOffSet;
@@ -17,7 +18,6 @@ namespace Magisterka
         public int currentSampleId = 0;
 
         abstract public void ReadHeader();
-        abstract public byte[] ReadNext();
 
         public double[] ByteArrayToDoubleArray(byte[] digit)
         {
@@ -28,6 +28,39 @@ namespace Magisterka
             }
             return doubleArray;
         }
+
+        public byte[] ReadNext()
+        {
+            using (FileStream stream = File.Open(path, FileMode.Open))
+            using (BinaryReader reader = new BinaryReader(stream))
+            {
+                if (currentSampleId < samplesCount)
+                {
+                    return ReadNextSymbol(reader);
+                }
+                else
+                {
+                    currentSampleId = 0;
+                    offSet = headerOffSet;
+                    return ReadNextSymbol(reader);
+                }
+            }
+        }
+
+        protected byte[] ReadNextSymbol(BinaryReader reader)
+        {
+            reader.BaseStream.Seek(offSet, SeekOrigin.Begin);
+            byte[] digit = new byte[sampleSize];
+
+            for (int i = 0; i < sampleSize; i++)
+            {
+                digit[i] = reader.ReadByte();
+            }
+            offSet = reader.BaseStream.Position;
+            currentSampleId++;
+            return digit;
+        }
+
         public int GetMagicNumber()
         {
             return magicNumber;
