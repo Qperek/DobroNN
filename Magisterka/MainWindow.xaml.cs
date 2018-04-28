@@ -27,7 +27,7 @@ namespace Magisterka
             InitializeComponent();
 
             ActivationNetwork network = new ActivationNetwork(new SigmoidFunction(), 784, 15, 10);
-            string path = "C:\\Users\\Maciek\\documents\\visual studio 2017\\Projects\\Magisterka\\Magisterka\\Data\\train-images.idx3-ubyte";
+            string path = ResourceStorage.testDigitsPath;
 
             DigitParser parser = new DigitParser(path);
             parser.ReadHeader();
@@ -66,7 +66,7 @@ namespace Magisterka
 
         public void ReadLabelTest()
         {
-            string path = "C:\\Users\\Maciek\\documents\\visual studio 2017\\Projects\\Magisterka\\Magisterka\\Data\\train-labels.idx1-ubyte";
+            string path = ResourceStorage.testLabelsPath;
             LabelParser lb = new LabelParser(path);
             
             lb.ReadHeader();
@@ -75,6 +75,13 @@ namespace Magisterka
                 "Offset: " + lb.GetOffSet().ToString());
             byte label = lb.GetLabel(lb.ReadNext());
             MessageBox.Show(label.ToString());
+        }
+
+        public void Learn(int iterations)
+        {
+            DigitParser dParser = new DigitParser(ResourceStorage.testDigitsPath);
+            LabelParser lParser = new LabelParser(ResourceStorage.testLabelsPath);
+
         }
     }
 }
