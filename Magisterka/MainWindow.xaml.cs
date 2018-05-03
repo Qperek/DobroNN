@@ -73,15 +73,26 @@ namespace Magisterka
             MessageBox.Show("Magic number: " + lb.GetMagicNumber().ToString() + "\n" +
                 "Samples count: " + lb.GetSampleCount().ToString() + "\n" +
                 "Offset: " + lb.GetOffSet().ToString());
-            byte label = lb.GetLabel(lb.ReadNext());
-            MessageBox.Show(label.ToString());
+            double[] output = lb.GetOutputFromByte(lb.GetLabel(lb.ReadNext()));
         }
 
         public void Learn(int iterations)
         {
-            DigitParser dParser = new DigitParser(ResourceStorage.testDigitsPath);
-            LabelParser lParser = new LabelParser(ResourceStorage.testLabelsPath);
+            DigitParser digitParser = new DigitParser(ResourceStorage.testDigitsPath);
+            LabelParser labelParser = new LabelParser(ResourceStorage.testLabelsPath);
 
+            digitParser.ReadHeader();
+            labelParser.ReadHeader();
+            
+            double[] input;
+            double[] output;
+
+            int epoch = digitParser.samplesCount;
+            for(int i = 0; i < 4 * epoch; i++)
+            {
+                input = digitParser.ByteArrayToDoubleArray(digitParser.ReadNext());
+                output = labelParser.GetOutputFromByte(labelParser.GetLabel(labelParser.ReadNext()));
+            }
         }
     }
 }

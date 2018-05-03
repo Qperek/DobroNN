@@ -33,5 +33,13 @@ namespace Magisterka
             else
                 throw (new ByteArrayToByteException("Byte array size is not 1"));
         }
+
+        public double[] GetOutputFromByte(byte label)
+        {
+            int[] intArray = Enumerable.Repeat(0, 10).ToArray();
+            double[] result = intArray.Select(x => (double)x).ToArray();
+            result[label] = 1;
+            return result;
+        }
     }
 }
