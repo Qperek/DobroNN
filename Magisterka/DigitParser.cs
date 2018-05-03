@@ -20,8 +20,9 @@ namespace Magisterka
         public DigitParser(string _path)
         {
             path = _path;
+            ReadHeader();
         }
-        override public void ReadHeader()
+        override protected void ReadHeader()
         {
             using (FileStream stream = File.Open(path, FileMode.Open))
             using (BinaryReader reader = new BinaryReader(stream))
@@ -84,6 +85,11 @@ namespace Magisterka
         public int GetWidth()
         {
             return rows;
+        }
+
+        public double[] GetNextInput()
+        {
+            return ByteArrayToDoubleArray(ReadNext());
         }
     }
 }

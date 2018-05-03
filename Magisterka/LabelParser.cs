@@ -12,9 +12,10 @@ namespace Magisterka
         public LabelParser(string _path)
         {
             path = _path;
+            ReadHeader();
         }
 
-        override public void ReadHeader()
+        override protected void ReadHeader()
         {
             using (FileStream stream = File.Open(path, FileMode.Open))
             using (BinaryReader reader = new BinaryReader(stream))
@@ -40,6 +41,11 @@ namespace Magisterka
             double[] result = intArray.Select(x => (double)x).ToArray();
             result[label] = 1;
             return result;
+        }
+
+        public double[] GetNextOutput()
+        {
+            return GetOutputFromByte(GetLabel(ReadNext()));
         }
     }
 }

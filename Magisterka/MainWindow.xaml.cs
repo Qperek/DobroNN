@@ -26,42 +26,20 @@ namespace Magisterka
         {
             InitializeComponent();
 
-            ActivationNetwork network = new ActivationNetwork(new SigmoidFunction(), 784, 15, 10);
-            string path = ResourceStorage.testDigitsPath;
+            /*   while(iterations < 30)
+               {
+                   digit = parser.ReadNext();
+                   input = parser.ByteArrayToDoubleArray(digit);
+                   output = new double[] { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 };
+                   err = teacher.Run(input, output);
 
-            DigitParser parser = new DigitParser(path);
-            parser.ReadHeader();
+                   if (iterations % 150000 == 0)
+                       MessageBox.Show(err.ToString());
+                   iterations++;
+               }
+               MessageBox.Show(err.ToString());*/
 
-            MessageBox.Show("Magic number: "+parser.GetMagicNumber().ToString()  + "\n" +
-                            "Samples count: "+parser.GetSampleCount().ToString() + "\n" +
-                            "Sample rows: " + parser.GetHeight().ToString()      + "\n" +
-                            "Sample collumns: " + parser.GetWidth().ToString()   + "\n" +
-                            "Offset: " + parser.GetOffSet().ToString());
-                                    
-            BackPropagationLearning teacher = new BackPropagationLearning(network);
-            byte[] digit;
-            double[] input;
-            double[] output;
-
-            double err = 9999.0d;
-            double[] result;
-            long iterations = 0;
-            
-
-            while(iterations < 30)
-            {
-                digit = parser.ReadNext();
-                input = parser.ByteArrayToDoubleArray(digit);
-                output = new double[] { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 };
-                err = teacher.Run(input, output);
-
-                if (iterations % 150000 == 0)
-                    MessageBox.Show(err.ToString());
-                iterations++;
-            }
-            MessageBox.Show(err.ToString());
-
-            ReadLabelTest();
+            Learn(6);
         }
 
         public void ReadLabelTest()
@@ -69,30 +47,66 @@ namespace Magisterka
             string path = ResourceStorage.testLabelsPath;
             LabelParser lb = new LabelParser(path);
             
-            lb.ReadHeader();
-            MessageBox.Show("Magic number: " + lb.GetMagicNumber().ToString() + "\n" +
-                "Samples count: " + lb.GetSampleCount().ToString() + "\n" +
-                "Offset: " + lb.GetOffSet().ToString());
             double[] output = lb.GetOutputFromByte(lb.GetLabel(lb.ReadNext()));
         }
 
-        public void Learn(int iterations)
+        public void ReadDigitTest()
         {
+            string path = ResourceStorage.testDigitsPath;
+
+            DigitParser parser = new DigitParser(path);
+            double[] result = parser.GetNextInput();
+        }
+
+        public void Learn(int epochsCount)
+        {
+            ActivationNetwork network = new ActivationNetwork(new SigmoidFunction(), 784, 15, 10);
+            BackPropagationLearning teacher = new BackPropagationLearning(network);
+
             DigitParser digitParser = new DigitParser(ResourceStorage.testDigitsPath);
             LabelParser labelParser = new LabelParser(ResourceStorage.testLabelsPath);
 
-            digitParser.ReadHeader();
-            labelParser.ReadHeader();
+            MessageBox.Show("Learning rate: " + teacher.LearningRate + "\n" +
+                            "Momentum: " + teacher.Momentum + "\n");
             
             double[] input;
             double[] output;
+            double err;
+            double prevErr = -1;
 
             int epoch = digitParser.samplesCount;
-            for(int i = 0; i < 4 * epoch; i++)
+
+            for(int i = 0; i < epochsCount * epoch; i++)
             {
-                input = digitParser.ByteArrayToDoubleArray(digitParser.ReadNext());
-                output = labelParser.GetOutputFromByte(labelParser.GetLabel(labelParser.ReadNext()));
+                input = digitParser.GetNextInput();
+                output = labelParser.GetNextOutput();
+                err = teacher.Run(input, output);
+                if (err == prevErr)
+                    break;
+                prevErr = err;
+                if (i % epoch == 0)
+                {
+                    MessageBox.Show(err.ToString());
+                    ShowWeights(network.Layers);
+                }
             }
+        }
+
+        public void ShowWeights(Layer[] layers)
+        {
+            Neuron[] neurons = layers[1].Neurons;
+            string result = "";
+
+            for(int i = 0; i < neurons.Count(); i++)
+            {
+                double[] weights = neurons[i].Weights;
+                for(int j = 0; j < weights.Count(); j++)
+                {
+                    result += weights[j].ToString("N3") + " ";
+                }
+                result += "\n";
+            }
+            MessageBox.Show(result);
         }
     }
 }

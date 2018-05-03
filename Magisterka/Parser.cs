@@ -17,7 +17,7 @@ namespace Magisterka
         public string path;
         public int currentSampleId = 0;
 
-        abstract public void ReadHeader();
+        abstract protected void ReadHeader();
 
         public double[] ByteArrayToDoubleArray(byte[] digit)
         {
