@@ -86,6 +86,7 @@
     <Compile Include="InRangeExeption.cs" />
     <Compile Include="NeuralNetworkManager.cs" />
     <Compile Include="ResourceStorage.cs" />
+    <Compile Include="TextBoxParseException.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

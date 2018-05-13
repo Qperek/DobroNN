@@ -6,14 +6,26 @@
         xmlns:local="clr-namespace:Magisterka"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="214,196,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
-        <Label Name="correct" Content="Label" HorizontalAlignment="Left" Margin="73,96,0,0" VerticalAlignment="Top" Height="25" Width="63"/>
-        <Label Name="network" Content="Label" HorizontalAlignment="Left" Margin="333,103,0,0" VerticalAlignment="Top" Height="26" Width="84"/>
-        <Label x:Name="correct1" Content="Label" HorizontalAlignment="Left" Margin="73,126,0,0" VerticalAlignment="Top" Height="25" Width="63"/>
-        <Label x:Name="correct2" Content="Label" HorizontalAlignment="Left" Margin="73,156,0,0" VerticalAlignment="Top" Height="25" Width="63"/>
-        <Label x:Name="network1" Content="Label" HorizontalAlignment="Left" Margin="333,129,0,0" VerticalAlignment="Top" Height="26" Width="84"/>
-        <Label x:Name="network2" Content="Label" HorizontalAlignment="Left" Margin="333,156,0,0" VerticalAlignment="Top" Height="26" Width="84"/>
-
-    </Grid>
+    <ScrollViewer ScrollViewer.VerticalScrollBarVisibility="Auto">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Name="LeftStackPanel" Grid.Column="0">
+                <Label Name="lblEpochs" Width="Auto" HorizontalAlignment="Left">Epochs count:</Label>
+                <TextBox Name="tboxEpochs" Width="90" Margin="5 0 0 5" HorizontalAlignment="Left"></TextBox>
+                <Label Name="lblLearningRate" Width="Auto" HorizontalAlignment="Left">Learning rate:</Label>
+                <TextBox Name="tboxLearningRate" Width="90" Margin="5 0 0 5" HorizontalAlignment="Left"></TextBox>
+                <Label Name="lblLayers" Width="Auto" HorizontalAlignment="Left">Layers:</Label>
+                <StackPanel Name="LayersStackPanel" Orientation="Horizontal">
+                    <TextBox Name="tboxLayers" Width="90" Margin="5 0 0 0" HorizontalAlignment="Left"></TextBox>
+                    <Button Name="btnSubmitLayers" Margin="5 0 0 0" Click="btnSubmitLayers_Click">Submit layers</Button>
+                </StackPanel>
+                <CheckBox Name="chboxNormalized" Margin="5 5 2 5" HorizontalAlignment="Left">Normalize Data</CheckBox>
+                <Button Name="btnStartLearning" Width="Auto" MinHeight="30" Margin="3 5 3 5">Start learning network</Button>
+                <ProgressBar Name="LearningProgressBar" MinWidth="150" MinHeight="20" Margin="3 5 3 5"></ProgressBar>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
 </Window>
