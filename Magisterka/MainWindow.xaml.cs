@@ -23,25 +23,11 @@ namespace Magisterka
     public partial class MainWindow : Window
     {
         private NeuralNetworkManager nnManager;
-        private List<TextBox> layersTextBoxes;
+        private int currentLayersCount = 0;
 
         public MainWindow()
         {
             InitializeComponent();
-
-            nnManager = new NeuralNetworkManager(new SigmoidFunction(1), 784, 30, 10);
-            
-            //TestNeuralNetworkManager(80);
-        }
-
-        public void TestNeuralNetworkManager(int epochsCount)
-        {
-            nnManager.SetTrainingPaths(ResourceStorage.trainDigitsPath, ResourceStorage.trainLabelsPath);
-            nnManager.SetLearingRate(0.1);
-
-            nnManager.TrainNetwork(epochsCount, true);
-            double correctAnswersPercentage = nnManager.TestNetwork(true);
-            MessageBox.Show(correctAnswersPercentage.ToString());         
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -51,31 +37,159 @@ namespace Magisterka
         private void btnSubmitLayers_Click(object sender, RoutedEventArgs e)
         {
             int positionToInsert = LeftStackPanel.Children.IndexOf(LayersStackPanel);
-            int layersCount;
+            ClearLayers();
 
-            if (!Int32.TryParse(tboxLayers.Text, out layersCount))
-                throw new TextBoxParseException("Cannot parse layers textbox");
-            layersTextBoxes = new List<TextBox>();
+            if (!Int32.TryParse(tboxLayers.Text, out currentLayersCount))
+                throw new TextBoxParseException("Cannot parse layers textbox");            
 
-            for (int i = 0; i < layersCount; i++)
+            for (int i = 0; i < currentLayersCount; i++)
             {
-                StackPanel tmpStackPanel = new StackPanel();
-                tmpStackPanel.Orientation = Orientation.Horizontal;
+                StackPanel tmpStackPanel = new StackPanel(){
+                    Orientation = Orientation.Horizontal,
+                    Name = "LayerStackPanel" + (i + 1)
+                };
 
-                tmpStackPanel.Children.Add(new TextBox
+                FillStackPanel(i, tmpStackPanel);
+                LeftStackPanel.Children.Insert(positionToInsert + 1, tmpStackPanel);
+                positionToInsert++;
+            }
+        }
+
+        private void ClearLayers()
+        {
+            int iterator = currentLayersCount;
+            UIElement el = null;
+
+            for(int i = LeftStackPanel.Children.Count - 1; i >= 0; i--)
+            {
+                if(LeftStackPanel.Children[i].GetType() == typeof(StackPanel))
                 {
-                    Name = "layer" + (i + 1),
-                    Height = 20,
-                    Margin = new Thickness(3, 1, 1, 3)
-                });
-                layersTextBoxes.Add(new TextBox
-                {
-                    Name = "layer" + (i + 1),
-                    Height = 20
-                });
-                LeftStackPanel.Children.Insert(positionToInsert + 1, layersTextBoxes[i]);
+                    if((LeftStackPanel.Children[i] as StackPanel).Name == "LayerStackPanel" + iterator)
+                    {
+                        el = LeftStackPanel.Children[i];
+                        LeftStackPanel.Children.Remove(el);
+                        iterator--;
+                    }
+                }
+            }
+        }
+
+        private static void FillStackPanel(int i, StackPanel tmpStackPanel)
+        {
+            tmpStackPanel.Children.Add(new Label
+            {
+                Name = "lblLayer" + (i + 1),
+                Height = 27,
+                Content = "Neurons in layer " + (i + 1),
+                Margin = new Thickness(3, 1, 1, 3)
+            });
+            tmpStackPanel.Children.Add(new TextBox
+            {
+                Name = "tboxLayer" + (i + 1),
+                Height = 27,
+                MinWidth = 70,
+                Margin = new Thickness(3, 1, 1, 3)
+            });
+        }
+
+        private void btnStartLearning_Click(object sender, RoutedEventArgs e)
+        {
+            if (!AreAllFieldsCorrect())
+            {
+                MessageBox.Show("Fill all the fields!");
+                return;
             }
 
+            CreateNetworkManager();
+          /*  nnManager = new NeuralNetworkManager(new SigmoidFunction(1), 784, 30, 10);
+            nnManager.SetTrainingPaths(ResourceStorage.trainDigitsPath, ResourceStorage.trainLabelsPath);
+            nnManager.SetLearingRate(0.1);
+
+            nnManager.TrainNetwork(epochsCount, true);
+            double correctAnswersPercentage = nnManager.TestNetwork(true);
+            MessageBox.Show(correctAnswersPercentage.ToString());*/
+
+        }
+
+        private void CreateNetworkManager()
+        {
+            ActivationFunctionParser parser = new ActivationFunctionParser();
+            if(!String.IsNullOrWhiteSpace(tboxAlpha.Text))
+                parser.SetAlpha(Double.Parse(tboxAlpha.Text));
+            
+            IActivationFunction activationFunction = parser.StringToActivationFunction(cmbActivationFunction.Text);
+            int[] layers = new int[currentLayersCount + 1];
+
+            GetLayersValues(layers);
+            layers[currentLayersCount] = 10;
+            nnManager = new NeuralNetworkManager(activationFunction, 784, layers);
+
+        }
+
+        private void GetLayersValues(int[] layers)
+        {
+            int iterator = currentLayersCount;
+            StackPanel el = null;
+
+            for (int i = LeftStackPanel.Children.Count - 1; i >= 0; i--)
+            {
+                if (LeftStackPanel.Children[i].GetType() == typeof(StackPanel))
+                {
+                    if ((LeftStackPanel.Children[i] as StackPanel).Name == "LayerStackPanel" + iterator)
+                    {
+                        el = (LeftStackPanel.Children[i] as StackPanel);
+                        layers[iterator - 1] = Int32.Parse((el.Children[1] as TextBox).Text);
+                        iterator--;
+                    }
+                }
+            }            
+        }
+
+        private bool AreAllFieldsCorrect()
+        {
+            if (!AreTextBoxesFilled())
+                return false;
+            if (currentLayersCount > 0)
+            {
+                if (!AreLayersFilled())
+                    return false;
+            }
+            return true;
+        }
+        private bool AreTextBoxesFilled()
+        {
+            foreach(var children in LeftStackPanel.Children)
+            {
+                if(children.GetType() == typeof(TextBox))
+                {
+                    if (String.IsNullOrWhiteSpace((children as TextBox).Text))
+                        return false;
+                }                
+            }
+            return true;
+        }
+
+        private bool AreLayersFilled()
+        {
+            int iterator = currentLayersCount;
+            StackPanel el = null;
+            TextBox tbox = null;
+
+            for (int i = LeftStackPanel.Children.Count - 1; i >= 0; i--)
+            {
+                if (LeftStackPanel.Children[i].GetType() == typeof(StackPanel))
+                {
+                    if ((LeftStackPanel.Children[i] as StackPanel).Name == "LayerStackPanel" + iterator)
+                    {
+                        el = (LeftStackPanel.Children[i] as StackPanel);
+                        tbox = (el.Children[1] as TextBox);
+                        iterator--;
+                        if (String.IsNullOrWhiteSpace(tbox.Text))
+                            return false;
+                    }
+                }
+            }
+            return true;
         }
     }
 }

@@ -18,12 +18,22 @@
                 <Label Name="lblLearningRate" Width="Auto" HorizontalAlignment="Left">Learning rate:</Label>
                 <TextBox Name="tboxLearningRate" Width="90" Margin="5 0 0 5" HorizontalAlignment="Left"></TextBox>
                 <Label Name="lblLayers" Width="Auto" HorizontalAlignment="Left">Layers:</Label>
-                <StackPanel Name="LayersStackPanel" Orientation="Horizontal">
+                <StackPanel Name="LayersStackPanel" Orientation="Horizontal" Margin="0 0 0 8">
                     <TextBox Name="tboxLayers" Width="90" Margin="5 0 0 0" HorizontalAlignment="Left"></TextBox>
                     <Button Name="btnSubmitLayers" Margin="5 0 0 0" Click="btnSubmitLayers_Click">Submit layers</Button>
                 </StackPanel>
                 <CheckBox Name="chboxNormalized" Margin="5 5 2 5" HorizontalAlignment="Left">Normalize Data</CheckBox>
-                <Button Name="btnStartLearning" Width="Auto" MinHeight="30" Margin="3 5 3 5">Start learning network</Button>
+                <Label Name="lblActivationFunction">Activation function:</Label>
+                <ComboBox Name="cmbActivationFunction">
+                    <ComboBoxItem>BipolarSigmoid</ComboBoxItem>
+                    <ComboBoxItem>Sigmoid</ComboBoxItem>
+                    <ComboBoxItem>Threshold</ComboBoxItem>
+                </ComboBox>
+                <StackPanel Orientation="Horizontal">
+                    <Label Name="lblAlpha">Activation function alpha:</Label>
+                    <TextBox Name="tboxAlpha" MinWidth="30"></TextBox>
+                </StackPanel>
+                <Button Name="btnStartLearning" Width="Auto" MinHeight="30" Margin="3 5 3 5" Click="btnStartLearning_Click">Start learning network</Button>
                 <ProgressBar Name="LearningProgressBar" MinWidth="150" MinHeight="20" Margin="3 5 3 5"></ProgressBar>
             </StackPanel>
         </Grid>
