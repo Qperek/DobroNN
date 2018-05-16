@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Magisterka"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="450" Width="580"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanMinimize">
     <ScrollViewer ScrollViewer.VerticalScrollBarVisibility="Auto">
         <Grid>
             <Grid.ColumnDefinitions>
@@ -13,28 +15,97 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <StackPanel Name="LeftStackPanel" Grid.Column="0">
-                <Label Name="lblEpochs" Width="Auto" HorizontalAlignment="Left">Epochs count:</Label>
-                <TextBox Name="tboxEpochs" Width="90" Margin="5 0 0 5" HorizontalAlignment="Left"></TextBox>
-                <Label Name="lblLearningRate" Width="Auto" HorizontalAlignment="Left">Learning rate:</Label>
-                <TextBox Name="tboxLearningRate" Width="90" Margin="5 0 0 5" HorizontalAlignment="Left"></TextBox>
-                <Label Name="lblLayers" Width="Auto" HorizontalAlignment="Left">Layers:</Label>
+                <Label Name="lblEpochs" 
+                       Width="Auto" 
+                       Margin="15 0 0 5" 
+                       HorizontalAlignment="Left"
+                       FontSize="16">Epochs count:
+                </Label>
+                <TextBox Name="tboxEpochs" 
+                         Width="150"
+                         MinHeight="25"
+                         Margin="15 0 0 5"
+                         FontSize="15"
+                         HorizontalAlignment="Left">test
+                </TextBox>
+                <Label Name="lblLearningRate"
+                       Width="Auto"
+                       Margin="15 0 0 5" 
+                       HorizontalAlignment="Left" 
+                       FontSize="16">Learning rate:
+                </Label>
+                <TextBox Name="tboxLearningRate" 
+                         Width="150"
+                         MinHeight="25"
+                         Margin="15 0 0 5"
+                         FontSize="15"
+                         HorizontalAlignment="Left">
+                </TextBox>
+                <Label Name="lblLayers" 
+                       Width="Auto"
+                       Margin="15 0 0 5" 
+                       HorizontalAlignment="Left" 
+                       FontSize="16">Layers:
+                </Label>
                 <StackPanel Name="LayersStackPanel" Orientation="Horizontal" Margin="0 0 0 8">
-                    <TextBox Name="tboxLayers" Width="90" Margin="5 0 0 0" HorizontalAlignment="Left"></TextBox>
-                    <Button Name="btnSubmitLayers" Margin="5 0 0 0" Click="btnSubmitLayers_Click">Submit layers</Button>
+                    <TextBox Name="tboxLayers" 
+                             MinHeight="25" 
+                             Width="90" 
+                             Margin="15 0 0 0"
+                             FontSize="15"
+                             HorizontalAlignment="Left">
+                        
+                    </TextBox>
+                    <Button Name="btnSubmitLayers" 
+                            Margin="5 0 0 0" 
+                            Click="btnSubmitLayers_Click" 
+                            MinWidth="100">Submit layers
+                    </Button>
                 </StackPanel>
-                <CheckBox Name="chboxNormalized" Margin="5 5 2 5" HorizontalAlignment="Left">Normalize Data</CheckBox>
-                <Label Name="lblActivationFunction">Activation function:</Label>
-                <ComboBox Name="cmbActivationFunction">
+                <CheckBox Name="chboxNormalized" 
+                          Margin="15 8 2 8"
+                          FontSize="16"
+                          VerticalContentAlignment="Center"                         
+                          HorizontalAlignment="Left">Normalize Data
+                </CheckBox>
+                <Label Name="lblActivationFunction"
+                       Margin="15 0 0 5" 
+                       FontSize="16">Activation function:
+                </Label>
+                <ComboBox Name="cmbActivationFunction"
+                          Margin="15 0 0 5" >
                     <ComboBoxItem>BipolarSigmoid</ComboBoxItem>
                     <ComboBoxItem>Sigmoid</ComboBoxItem>
                     <ComboBoxItem>Threshold</ComboBoxItem>
                 </ComboBox>
-                <StackPanel Orientation="Horizontal">
-                    <Label Name="lblAlpha">Activation function alpha:</Label>
-                    <TextBox Name="tboxAlpha" MinWidth="30"></TextBox>
+                <StackPanel Orientation="Horizontal"
+                            Margin="15 0 0 5" >
+                    <Label Name="lblAlpha">Activation function alpha:
+                    </Label>
+                    <TextBox Name="tboxAlpha" 
+                             MinWidth="50">
+                    </TextBox>
                 </StackPanel>
-                <Button Name="btnStartLearning" Width="Auto" MinHeight="30" Margin="3 5 3 5" Click="btnStartLearning_Click">Start learning network</Button>
-                <ProgressBar Name="LearningProgressBar" MinWidth="150" MinHeight="20" Margin="3 5 3 5"></ProgressBar>
+                <Button Name="btnStartLearning" 
+                        Width="Auto" MinHeight="30" 
+                        Margin="3 5 3 5" 
+                        Click="btnStartLearning_Click">Start learning network
+                </Button>
+            </StackPanel>
+            <StackPanel Grid.Column="1">
+                <Label Margin="5 10 0 0">Training progress:</Label>
+                <Grid>
+                <ProgressBar Name="LearningProgressBar" 
+                             MinWidth="300" 
+                             MinHeight="30">
+                </ProgressBar>
+                    <Label Name="prgBarPercentage"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                        0%
+                    </Label>
+                </Grid>
+                <Label Name="lblCurrentError">Summary network training error:</Label>
             </StackPanel>
         </Grid>
     </ScrollViewer>

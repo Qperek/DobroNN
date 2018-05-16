@@ -101,14 +101,35 @@ namespace Magisterka
             }
 
             CreateNetworkManager();
-          /*  nnManager = new NeuralNetworkManager(new SigmoidFunction(1), 784, 30, 10);
+          
             nnManager.SetTrainingPaths(ResourceStorage.trainDigitsPath, ResourceStorage.trainLabelsPath);
-            nnManager.SetLearingRate(0.1);
+            SetLearningRate();
+            StartTraining();
+          /*  nnManager.SetLearingRate(0.1);
 
             nnManager.TrainNetwork(epochsCount, true);
             double correctAnswersPercentage = nnManager.TestNetwork(true);
             MessageBox.Show(correctAnswersPercentage.ToString());*/
 
+        }
+
+        private async void StartTraining()
+        {
+            int epochsCount = Int32.Parse(tboxEpochs.Text);
+            bool isNormalized = (bool)chboxNormalized.IsChecked;
+
+            Progress<int> progress = new Progress<int>();
+            progress.ProgressChanged += ReportProgress;
+
+            double networkError = await Task.Run(() => nnManager.TrainNetwork(epochsCount, progress, isNormalized));
+            lblCurrentError.Content = "Network error: " + networkError.ToString("N4");
+            MessageBox.Show("Training complete");
+        }
+
+        private void ReportProgress(object sender, int e)
+        {
+            LearningProgressBar.Value = e;
+            prgBarPercentage.Content = e.ToString() +"%";
         }
 
         private void CreateNetworkManager()
@@ -123,9 +144,16 @@ namespace Magisterka
             GetLayersValues(layers);
             layers[currentLayersCount] = 10;
             nnManager = new NeuralNetworkManager(activationFunction, 784, layers);
-
         }
 
+        private void SetLearningRate()
+        {
+            if(!String.IsNullOrWhiteSpace(tboxLearningRate.Text))
+            { 
+                double learningRate = Double.Parse(tboxLearningRate.Text);
+                nnManager.SetLearingRate(learningRate);
+            }
+        }
         private void GetLayersValues(int[] layers)
         {
             int iterator = currentLayersCount;

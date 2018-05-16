@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Magisterka
 {
@@ -43,9 +44,9 @@ namespace Magisterka
                 throw new InRangeExeption("Learing rate value out of range");
         }
 
-        public double TrainNetwork(int epochsCount, bool isInputNormalized = false)
+        public double TrainNetwork(int epochsCount, IProgress<int> progress ,bool isInputNormalized = false)
         {
-            if (!isInitialized)
+            if (!isInitialized) 
                 return -1;
 
             input = CreateEpochInput();
@@ -61,6 +62,7 @@ namespace Magisterka
             {
                 err = teacher.RunEpoch(input, output);
                 SaveErrorToFile(i, err);
+                progress.Report(((i + 1) * 100) / epochsCount);
             }
             return err;
         }
